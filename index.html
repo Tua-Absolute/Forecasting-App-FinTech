@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stealth Forecast — Stock Forecasts</title>
+  <meta name="description" content="Five years of stock history and a five-year price forecast for any US stock." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111'/%3E%3Cpath d='M6 22l6-7 5 4 9-11' stroke='%23ee3a3a' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Stealth Forecast home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 23l6-7 5 4 10-12" /></svg>
+      <span>STEALTH<b>FORECAST</b></span>
+    </a>
+
+    <form class="search" id="searchForm" role="search" autocomplete="off">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>
+      <input id="searchInput" type="search" placeholder="Search a company or ticker — e.g. NVDA, Ford" aria-label="Search stocks" aria-autocomplete="list" aria-controls="searchResults" />
+      <kbd>/</kbd>
+      <ul id="searchResults" class="results" role="listbox" hidden></ul>
+    </form>
+
+    <div class="account">
+      <span id="planBadge" class="plan-badge" data-plan="free">FREE</span>
+      <a class="btn btn-ghost" href="#plans">Plans</a>
+    </div>
+  </header>
+
+  <div class="tape" aria-label="Market overview">
+    <div class="tape-track" id="tape"></div>
+  </div>
+
+  <div id="flash" class="flash" role="status" hidden></div>
+
+  <main class="wrap">
+    <section class="hero" aria-live="polite">
+      <div class="identity">
+        <div class="logo" id="coLogo" aria-hidden="true"></div>
+        <div>
+          <div class="sym-line"><span id="coSymbol" class="sym">—</span><span id="coExchange" class="chip"></span><span id="coIndustry" class="chip"></span></div>
+          <h1 id="coName">Loading…</h1>
+        </div>
+      </div>
+      <div class="price-block">
+        <div class="price" id="price">—</div>
+        <div class="change" id="change"></div>
+        <div class="asof" id="asof"></div>
+      </div>
+    </section>
+
+    <section class="stats" id="stats" aria-label="Key statistics"></section>
+
+    <section class="card chart-card">
+      <div class="card-head">
+        <div>
+          <h2>History &amp; forecast</h2>
+          <p class="sub" id="chartSub">Weekly closes, adjusted for splits and dividends.</p>
+        </div>
+        <div class="controls" role="group" aria-label="Chart range">
+          <button class="seg" data-range="1y">1Y</button>
+          <button class="seg" data-range="5y">5Y</button>
+          <button class="seg is-on" data-range="all">5Y + Forecast</button>
+          <button class="seg seg-icon" id="tableToggle" aria-pressed="false" title="Show as table">Table</button>
+        </div>
+      </div>
+
+      <div class="legend" id="legend"></div>
+      <div class="chart" id="chart" role="img" aria-label="Price history and forecast chart"></div>
+      <div class="chart-table" id="chartTable" hidden></div>
+      <div class="chart-error" id="chartError" hidden></div>
+
+      <div class="milestones" id="milestones"></div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card">
+        <div class="card-head"><h2>Last five years</h2></div>
+        <div class="kpis" id="histStats"></div>
+        <p class="note" id="methodNote"></p>
+      </section>
+
+      <section class="card" id="modelsCard">
+        <div class="card-head">
+          <h2>Model check <span class="tag">MAX</span></h2>
+        </div>
+        <div id="modelsBody"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="card-head"><h2>Latest news</h2></div>
+      <ul class="news" id="news"></ul>
+    </section>
+
+    <section class="plans" id="plans">
+      <div class="plans-head">
+        <h2>Plans</h2>
+        <p>Stripe test mode — use card <code>4242 4242 4242 4242</code>, any future date, any CVC. No real charges.</p>
+      </div>
+      <div class="plan-grid">
+        <article class="plan" data-plan="free">
+          <h3>Free</h3>
+          <div class="amt">$0<span>/mo</span></div>
+          <ul>
+            <li>Live quotes &amp; key stats</li>
+            <li>Five years of price history</li>
+            <li>One-year forecast</li>
+            <li>Company news</li>
+          </ul>
+          <button class="btn btn-ghost" data-choose="free">Current plan</button>
+        </article>
+        <article class="plan plan-featured" data-plan="premium">
+          <div class="ribbon">Popular</div>
+          <h3>Premium</h3>
+          <div class="amt">$20<span>/mo</span></div>
+          <ul>
+            <li>Everything in Free</li>
+            <li><b>Five-year forecast</b></li>
+            <li>80% and 95% price ranges</li>
+            <li>Year-by-year price targets</li>
+          </ul>
+          <button class="btn btn-red" data-choose="premium">Get Premium</button>
+        </article>
+        <article class="plan" data-plan="max">
+          <h3>Max</h3>
+          <div class="amt">$40<span>/mo</span></div>
+          <ul>
+            <li>Everything in Premium</li>
+            <li><b>Three forecasting models</b> side by side</li>
+            <li>Backtest: how each model did last year</li>
+            <li>Model accuracy scores</li>
+          </ul>
+          <button class="btn btn-red" data-choose="max">Get Max</button>
+        </article>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <p><b>Not investment advice.</b> Forecasts are statistical projections from past prices. They show a likely range, not a promise, and real outcomes often fall outside it.</p>
+      <p>Quotes, profiles, metrics and news: Finnhub. Price history: Alpha Vantage. Payments: Stripe (test mode, demonstration only).</p>
+    </footer>
+  </main>
+
+  <div class="tooltip" id="tooltip" hidden></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
