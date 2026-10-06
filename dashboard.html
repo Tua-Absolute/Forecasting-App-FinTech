@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Dashboard — Stealth Forecast</title>
+  <meta name="description" content="Compare up to three saved stocks and track the metrics you care about." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/dashboard.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111'/%3E%3Cpath d='M6 22l6-7 5 4 9-11' stroke='%23ee3a3a' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Stealth Forecast home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 23l6-7 5 4 10-12" /></svg>
+      <span>STEALTH<b>FORECAST</b></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="/">Stocks</a>
+      <a href="/dashboard" aria-current="page">Dashboard</a>
+    </nav>
+    <div class="account">
+      <span id="planBadge" class="plan-badge" data-plan="free">FREE</span>
+      <a class="btn btn-ghost" href="/#plans">Plans</a>
+    </div>
+  </header>
+
+  <div id="flash" class="flash" role="status" hidden></div>
+
+  <main class="wrap">
+    <section class="dash-head">
+      <div>
+        <h1>My dashboard</h1>
+        <p class="sub">Save up to three stocks, enter your own position, and choose the metrics you want to compare. Saved on this device.</p>
+      </div>
+      <div class="dash-actions">
+        <span class="count" id="count">0 / 3 stocks</span>
+        <button class="btn btn-ghost" id="refreshBtn" title="Refresh prices">Refresh</button>
+      </div>
+    </section>
+
+    <section class="kpis-row" id="portfolio" aria-label="My portfolio" hidden></section>
+
+    <section class="slots" id="slots" aria-label="Saved stocks"></section>
+
+    <section class="card" id="compareCard" hidden>
+      <div class="card-head">
+        <div>
+          <h2>Compare</h2>
+          <p class="sub" id="compareSub">Your tracked metrics, side by side. The strongest value in each row is marked.</p>
+        </div>
+        <button class="btn btn-ghost" id="metricsBtn" aria-expanded="false" aria-controls="picker">Choose metrics</button>
+      </div>
+      <div class="picker" id="picker" hidden></div>
+      <div class="table-wrap"><table class="compare" id="compare"></table></div>
+    </section>
+
+    <section class="card" id="perfCard" hidden>
+      <div class="card-head">
+        <div>
+          <h2>Performance</h2>
+          <p class="sub" id="perfSub">Percent change from the start of the period, so stocks at different prices compare fairly.</p>
+        </div>
+        <div class="controls" role="group" aria-label="Performance range">
+          <button class="seg is-on" data-perf="1y">1Y</button>
+          <button class="seg" data-perf="5y">5Y</button>
+        </div>
+      </div>
+      <div class="legend" id="perfLegend"></div>
+      <div class="chart perf-chart" id="perfChart" role="img" aria-label="Indexed performance of saved stocks"></div>
+      <div class="chart-error" id="perfError" hidden></div>
+    </section>
+
+    <footer class="foot">
+      <p><b>Not investment advice.</b> Positions you enter are only used for the math on this page and never leave your browser.</p>
+      <p>Quotes and metrics: Finnhub. Price history: Alpha Vantage.</p>
+    </footer>
+  </main>
+
+  <div class="tooltip" id="tooltip" hidden></div>
+  <script type="module" src="/dashboard.js"></script>
+</body>
+</html>

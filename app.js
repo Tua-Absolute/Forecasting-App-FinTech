@@ -1,4 +1,5 @@
 // Stealth Forecast front end — no framework, no build step.
+import * as dash from './store.js';
 
 const $ = (s) => document.querySelector(s);
 const COLORS = { history: '#e6e6e9', drift: '#ee3a3a', holt: '#4a7ff0', linear: '#13a3a0' };
@@ -221,9 +222,48 @@ function selectSymbol(sym) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ---------- dashboard button ----------
+function renderDash() {
+  const n = dash.load().stocks.length;
+  const badge = $('#dashCount');
+  badge.hidden = n === 0;
+  badge.textContent = n;
+  const btn = $('#dashBtn');
+  const on = state.symbol && dash.has(state.symbol);
+  btn.setAttribute('aria-pressed', on);
+  btn.querySelector('span').textContent = on ? 'On your dashboard' : 'Add to dashboard';
+  btn.title = on ? 'Click to remove from your dashboard' : `Save ${state.symbol || 'this stock'} to your dashboard`;
+}
+$('#dashBtn').addEventListener('click', () => {
+  const sym = state.symbol;
+  if (!sym) return;
+  if (dash.has(sym)) {
+    dash.removeStock(sym);
+    flash(`${sym} removed from your dashboard.`);
+  } else {
+    const r = dash.addStock(sym);
+    if (r === 'full') {
+      const el = $('#flash');
+      el.className = 'flash err';
+      el.innerHTML = `Your dashboard already holds ${dash.MAX_STOCKS} stocks. <a href="/dashboard">Open the dashboard</a> to remove one first.`;
+      el.hidden = false;
+      return;
+    }
+    const el = $('#flash');
+    el.className = 'flash ok';
+    el.innerHTML = `${esc(sym)} saved to your dashboard. <a href="/dashboard">Compare it now →</a>`;
+    el.hidden = false;
+    clearTimeout(flash.t);
+    flash.t = setTimeout(() => (el.hidden = true), 8000);
+  }
+  renderDash();
+});
+addEventListener('sf-dashboard', renderDash);
+
 // ---------- loading ----------
 function load(sym) {
   state.symbol = sym;
+  renderDash();
   document.title = `${sym} forecast — Stealth Forecast`;
   loadStock(sym);
   loadForecast(sym);
@@ -479,12 +519,13 @@ function renderChart() {
   const startY = new Date(t0).getUTCFullYear();
   const endY = new Date(t1).getUTCFullYear();
   if (state.range === '1y') {
-    for (let d = new Date(Date.UTC(new Date(t0).getUTCFullYear(), new Date(t0).getUTCMonth() + 1, 1)); d.getTime() <= t1; d.setUTCMonth(d.getUTCMonth() + 2)) {
+    const monthStep = iw < 420 ? 4 : iw < 700 ? 3 : 2;
+    for (let d = new Date(Date.UTC(new Date(t0).getUTCFullYear(), new Date(t0).getUTCMonth() + 1, 1)); d.getTime() <= t1; d.setUTCMonth(d.getUTCMonth() + monthStep)) {
       const tx = el('text', { x: x(d.getTime()), y: H - 8, 'text-anchor': 'middle' }, ax);
       tx.textContent = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit', timeZone: 'UTC' });
     }
   } else {
-    const every = endY - startY > 8 ? 2 : 1;
+    const every = endY - startY > 8 || iw < 420 ? 2 : 1;
     for (let yr = startY + 1; yr <= endY; yr += every) {
       const tt = Date.UTC(yr, 0, 1);
       if (tt < t0 || tt > t1) continue;

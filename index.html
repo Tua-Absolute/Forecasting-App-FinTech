@@ -17,6 +17,10 @@
       <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 23l6-7 5 4 10-12" /></svg>
       <span>STEALTH<b>FORECAST</b></span>
     </a>
+    <nav class="nav" aria-label="Main">
+      <a href="/" aria-current="page">Stocks</a>
+      <a href="/dashboard">Dashboard<span class="nav-count" id="dashCount" hidden></span></a>
+    </nav>
 
     <form class="search" id="searchForm" role="search" autocomplete="off">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>
@@ -44,6 +48,10 @@
         <div>
           <div class="sym-line"><span id="coSymbol" class="sym">—</span><span id="coExchange" class="chip"></span><span id="coIndustry" class="chip"></span></div>
           <h1 id="coName">Loading…</h1>
+          <button class="btn btn-ghost btn-sm dash-btn" id="dashBtn" type="button" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg>
+            <span>Add to dashboard</span>
+          </button>
         </div>
       </div>
       <div class="price-block">

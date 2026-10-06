@@ -23,6 +23,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; }
 body {
   background: var(--bg);
@@ -83,6 +84,18 @@ code { font-family: var(--mono); font-size: 0.92em; background: var(--surface-2)
 .btn-red { background: var(--red); color: #fff; }
 .btn-red:hover { background: #ff4b4b; }
 .btn[disabled] { opacity: .55; cursor: default; }
+
+/* ---------- nav ---------- */
+.nav { display: flex; gap: 4px; flex-shrink: 0; }
+.nav a { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 8px; text-decoration: none; color: var(--ink-2); font-weight: 600; font-size: 14px; }
+.nav a:hover { color: var(--ink); background: var(--surface); }
+.nav a[aria-current='page'] { color: var(--ink); box-shadow: inset 0 -2px 0 var(--red); border-radius: 8px 8px 0 0; }
+.nav-count { font: 500 11px var(--mono); background: var(--red); color: #fff; border-radius: 999px; padding: 0 6px; line-height: 17px; }
+.btn-sm { height: 32px; padding: 0 12px; font-size: 13px; }
+.dash-btn { margin-top: 10px; gap: 6px; }
+.dash-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+.dash-btn[aria-pressed='true'] { border-color: var(--red); color: var(--ink); }
+.dash-btn[aria-pressed='true'] svg { fill: var(--red); stroke: var(--red); }
 
 /* ---------- ticker tape ---------- */
 .tape { overflow: hidden; border-bottom: 1px solid var(--line); background: #0b0b0d; }
@@ -234,6 +247,9 @@ td { font-family: var(--mono); }
 @media (max-width: 640px) {
   .topbar { flex-wrap: wrap; padding: 10px 16px; gap: 10px; }
   .search { order: 3; flex-basis: 100%; max-width: none; }
+  .nav { order: 2; }
+  .nav a { padding: 0 8px; }
+  .account .btn { display: none; }
   .wrap { padding: 20px 16px 48px; }
   .hero { align-items: flex-start; }
   .price-block { text-align: left; }
@@ -242,3 +258,4 @@ td { font-family: var(--mono); }
   .controls { flex-wrap: wrap; }
   .kpis { grid-template-columns: 1fr 1fr; }
 }
+.flash a { color: var(--red); font-weight: 600; text-underline-offset: 3px; }
