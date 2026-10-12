@@ -92,11 +92,17 @@ function ctx(entry) {
     cur: d.stock?.profile?.currency || 'USD',
     fc: d.fc,
     fcErr: d.fcErr,
+    fcLoading: d.fcLoading,
     stockErr: d.stockErr,
   };
 }
 
 // ---------- data ----------
+// Price history comes from Alpha Vantage, whose free key allows about one request per second,
+// so forecasts load one at a time while quotes load in parallel.
+let fcChain = Promise.resolve();
+const queueForecast = (fn) => (fcChain = fcChain.then(fn, fn));
+
 async function loadSymbol(sym, { quotesOnly = false } = {}) {
   const d = cache.get(sym) || {};
   d.loading = !d.stock;
@@ -104,11 +110,17 @@ async function loadSymbol(sym, { quotesOnly = false } = {}) {
   const jobs = [
     api(`/api/stock?symbol=${encodeURIComponent(sym)}`)
       .then((s) => ((d.stock = s), (d.stockErr = null)))
-      .catch((e) => (d.stockErr = e.message)),
+      .catch((e) => (d.stockErr = e.message))
+      .finally(() => {
+        d.loading = false;
+        renderData();
+      }),
   ];
-  if (!quotesOnly)
+  if (!quotesOnly) {
+    d.fcLoading = !d.fc;
     jobs.push(
-      api(`/api/forecast?symbol=${encodeURIComponent(sym)}`)
+      queueForecast(() =>
+        api(`/api/forecast?symbol=${encodeURIComponent(sym)}`)
         .then((f) => {
           d.fc = f;
           d.fcErr = null;
@@ -118,10 +130,14 @@ async function loadSymbol(sym, { quotesOnly = false } = {}) {
           }
         })
         .catch((e) => (d.fcErr = e.message))
+        .finally(() => {
+          d.fcLoading = false;
+          renderData();
+        })
+      )
     );
+  }
   await Promise.allSettled(jobs);
-  d.loading = false;
-  renderData();
 }
 
 function loadAll(opts) {
@@ -438,6 +454,7 @@ function renderCompare(d) {
         .map((c, i) => {
           if (c.loading) return `<td>…</td>`;
           if (m.premium && plan === 'free') return `<td class="locked"><a href="/#plans">🔒 Premium</a></td>`;
+          if (m.needs === 'fc' && c.fcLoading) return `<td>…</td>`;
           if (m.needs === 'fc' && !c.fc) return `<td title="${esc(c.fcErr || '')}">—</td>`;
           if (m.needs === 'pos' && vals[i] == null) return `<td><span class="sub2">Enter position</span></td>`;
           return `<td class="${i === bestIdx ? 'is-best' : ''}">${m.show(c, vals[i])}</td>`;
@@ -477,7 +494,7 @@ function renderPerf(d) {
     })
     .filter(Boolean);
 
-  const anyLoading = d.stocks.some((e) => cache.get(e.symbol)?.loading);
+  const anyLoading = d.stocks.some((e) => cache.get(e.symbol)?.fcLoading);
   if (!series.length) {
     box.innerHTML = anyLoading ? '<div class="skeleton"></div>' : '';
     $('#perfLegend').innerHTML = '';

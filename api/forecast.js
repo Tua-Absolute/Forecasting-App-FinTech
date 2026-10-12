@@ -9,7 +9,10 @@ import { forecast, TIERS } from '../lib/forecast.js';
 async function loadHistory(req, symbol) {
   // Go through our own CDN-cached endpoint first so Alpha Vantage's 25/day limit is shared by all visitors.
   try {
-    const r = await fetch(`${origin(req)}/api/history?symbol=${encodeURIComponent(symbol)}`);
+    // Forward the visitor's cookies so this works when Vercel deployment protection is on.
+    const r = await fetch(`${origin(req)}/api/history?symbol=${encodeURIComponent(symbol)}`, {
+      headers: req.headers.cookie ? { cookie: req.headers.cookie } : {},
+    });
     if (r.ok) return await r.json();
     if (r.status === 404 || r.status === 429) {
       const body = await r.json().catch(() => ({}));
