@@ -2,6 +2,30 @@
 
 Stock dashboard with five years of price history and a five-year forecast. Red and black theme, no build step, no npm dependencies.
 
+## Screenshots
+
+> Captured from a local run with **sample data** (prices, metrics and headlines are illustrative, not real market data).
+
+**Stock page.** Live quote, key stats and five years of weekly history with a forecast. The Free plan shows one year; years 2 to 5 unlock with Premium.
+
+![Stock page with price history and one-year forecast](docs/screenshots/stock-page.png)
+
+**Max plan.** Five-year forecast with 80%/95% ranges, three models side by side, yearly targets and a one-year backtest.
+
+![Five-year forecast with three models and model check](docs/screenshots/forecast-max.png)
+
+**Dashboard.** Up to three saved stocks with your own position, portfolio totals, your chosen metrics compared side by side, and indexed performance.
+
+![Dashboard comparing three stocks](docs/screenshots/dashboard.png)
+
+**Plans.** Stripe Checkout in test mode.
+
+![Free, Premium and Max plans](docs/screenshots/plans.png)
+
+**Mobile.**
+
+<img src="docs/screenshots/mobile.png" alt="Stock page and dashboard on a phone" width="600">
+
 ## Setup (Vercel → Project → Settings → Environment Variables)
 
 | Variable | Where to get it |
